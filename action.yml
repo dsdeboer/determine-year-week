@@ -1,0 +1,17 @@
+name: 'Determine year-week'
+description: 'Determines the current week and year, returning it via output'
+author: 'Duncan de Boer'
+
+# Add your action's branding here. This will appear on the GitHub Marketplace.
+branding:
+  icon: 'heart'
+  color: 'red'
+
+# Define your outputs here.
+outputs:
+  return_value:
+    description: 'The current year and week'
+
+runs:
+  using: node20
+  main: dist/index.js
