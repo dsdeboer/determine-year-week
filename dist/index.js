@@ -25676,7 +25676,7 @@ async function run() {
     const date_value = core.getInput('current_date');
     core.debug(`Date value given '${date_value}'`);
     const dateNow = date_value ? new Date(date_value) : new Date();
-    const releaseName = `release/${(0, date_fns_1.getWeekYear)(dateNow, { weekStartsOn: 2 })}-${String((0, date_fns_1.getISOWeek)(dateNow)).padStart(2, '0')}`;
+    const releaseName = `release/${(0, date_fns_1.getWeekYear)(dateNow)}-${String((0, date_fns_1.getISOWeek)(dateNow)).padStart(2, '0')}`;
     core.debug(`Date value parsed '${releaseName}'`);
     core.setOutput('release_name', releaseName);
     return Promise.resolve();
