@@ -13,7 +13,7 @@ import * as main from '../src/main'
 const runMock = jest.spyOn(main, 'run')
 
 // Other utilities
-const timeRegex = /^\d{2}:\d{2}:\d{2}/
+const timeRegex = /^\d{4}-\d{2}/
 
 // Mock the GitHub Actions core library
 let debugMock: jest.SpiedFunction<typeof core.debug>
@@ -53,35 +53,40 @@ describe('action', () => {
     expect(errorMock).not.toHaveBeenCalled()
   })
 
-  it.each(['', '2024-12-31', '2024-12-01', '2025-01-01', '2025-01-31'])(
-    'sets the correct time output `%s`',
-    async date_value => {
-      // Set the action's inputs as return values from core.getInput()
-      getInputMock.mockImplementation(name => {
-        switch (name) {
-          case 'date_value':
-            return date_value
-          default:
-            return ''
-        }
-      })
+  it.each([
+    ['2024-12-31', '2025-01'],
+    ['2024-12-01', '2024-48'],
+    ['2025-01-01', '2025-01'],
+    ['2025-01-31', '2025-05']
+  ])('sets the correct time output `%s`', async (date_value, result) => {
+    // Set the action's inputs as return values from core.getInput()
+    getInputMock.mockImplementation(name => {
+      switch (name) {
+        case 'current_date':
+          return date_value
+        default:
+          return ''
+      }
+    })
 
-      await main.run()
-      expect(runMock).toHaveReturned()
-      expect(debugMock).toHaveBeenNthCalledWith(1, `Date value given ''`)
-      expect(debugMock).toHaveBeenNthCalledWith(
-        2,
-        `Date value parsed 'Tue Dec 31 2024'`
-      )
+    await main.run()
+    expect(runMock).toHaveReturned()
+    expect(debugMock).toHaveBeenNthCalledWith(
+      1,
+      `Date value given '${date_value}'`
+    )
+    expect(debugMock).toHaveBeenNthCalledWith(
+      2,
+      `Date value parsed '${result}'`
+    )
 
-      expect(setOutputMock).toHaveBeenNthCalledWith(
-        1,
-        'return_value',
-        expect.stringMatching(timeRegex)
-      )
-      expect(errorMock).not.toHaveBeenCalled()
-    }
-  )
+    expect(setOutputMock).toHaveBeenNthCalledWith(
+      1,
+      'return_value',
+      expect.stringMatching(timeRegex)
+    )
+    expect(errorMock).not.toHaveBeenCalled()
+  })
 
   it('sets a failed status', async () => {
     await main.run()
