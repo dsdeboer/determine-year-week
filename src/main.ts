@@ -9,12 +9,8 @@ export async function run(): Promise<void> {
   const date_value: string = core.getInput('current_date')
   core.debug(`Date value given '${date_value}'`)
   const dateNow = date_value ? new Date(date_value) : new Date()
-  core.debug(
-    `Date value parsed '${getWeekYear(dateNow, { weekStartsOn: 2 })}-${String(getISOWeek(dateNow)).padStart(2, '0')}'`
-  )
-  core.setOutput(
-    'return_value',
-    `${getWeekYear(dateNow, { weekStartsOn: 2 })}-${String(getISOWeek(dateNow)).padStart(2, '0')}`
-  )
+  const releaseName = `release/${getWeekYear(dateNow, { weekStartsOn: 2 })}-${String(getISOWeek(dateNow)).padStart(2, '0')}`
+  core.debug(`Date value parsed '${releaseName}'`)
+  core.setOutput('release_name', releaseName)
   return Promise.resolve()
 }

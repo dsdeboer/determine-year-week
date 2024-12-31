@@ -16,7 +16,7 @@ inputs:
 
 # Define your outputs here.
 outputs:
-  return_value:
+  release_name:
     description: 'The current year and week'
 
 runs:

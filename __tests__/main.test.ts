@@ -13,7 +13,7 @@ import * as main from '../src/main'
 const runMock = jest.spyOn(main, 'run')
 
 // Other utilities
-const timeRegex = /^\d{4}-\d{2}/
+const timeRegex = /^release\/\d{4}-\d{2}/
 
 // Mock the GitHub Actions core library
 let debugMock: jest.SpiedFunction<typeof core.debug>
@@ -32,32 +32,22 @@ describe('action', () => {
   })
 
   it('sets the time output', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
-      switch (name) {
-        case 'milliseconds':
-          return '500'
-        default:
-          return ''
-      }
-    })
-
     await main.run()
     expect(runMock).toHaveReturned()
 
     expect(setOutputMock).toHaveBeenNthCalledWith(
       1,
-      'return_value',
+      'release_name',
       expect.stringMatching(timeRegex)
     )
     expect(errorMock).not.toHaveBeenCalled()
   })
 
   it.each([
-    ['2024-12-31', '2025-01'],
-    ['2024-12-01', '2024-48'],
-    ['2025-01-01', '2025-01'],
-    ['2025-01-31', '2025-05']
+    ['2024-12-31', 'release/2025-01'],
+    ['2024-12-01', 'release/2024-48'],
+    ['2025-01-01', 'release/2025-01'],
+    ['2025-01-31', 'release/2025-05']
   ])('sets the correct time output `%s`', async (date_value, result) => {
     // Set the action's inputs as return values from core.getInput()
     getInputMock.mockImplementation(name => {
@@ -82,7 +72,7 @@ describe('action', () => {
 
     expect(setOutputMock).toHaveBeenNthCalledWith(
       1,
-      'return_value',
+      'release_name',
       expect.stringMatching(timeRegex)
     )
     expect(errorMock).not.toHaveBeenCalled()
