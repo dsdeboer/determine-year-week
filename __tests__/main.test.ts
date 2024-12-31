@@ -16,6 +16,7 @@ const runMock = jest.spyOn(main, 'run')
 const timeRegex = /^\d{2}:\d{2}:\d{2}/
 
 // Mock the GitHub Actions core library
+let debugMock: jest.SpiedFunction<typeof core.debug>
 let errorMock: jest.SpiedFunction<typeof core.error>
 let getInputMock: jest.SpiedFunction<typeof core.getInput>
 let setOutputMock: jest.SpiedFunction<typeof core.setOutput>
@@ -24,6 +25,7 @@ describe('action', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
+    debugMock = jest.spyOn(core, 'debug').mockImplementation()
     errorMock = jest.spyOn(core, 'error').mockImplementation()
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
@@ -51,11 +53,40 @@ describe('action', () => {
     expect(errorMock).not.toHaveBeenCalled()
   })
 
+  it.each(['', '2024-12-31', '2024-12-01', '2025-01-01', '2025-01-31'])(
+    'sets the correct time output `%s`',
+    async date_value => {
+      // Set the action's inputs as return values from core.getInput()
+      getInputMock.mockImplementation(name => {
+        switch (name) {
+          case 'date_value':
+            return date_value
+          default:
+            return ''
+        }
+      })
+
+      await main.run()
+      expect(runMock).toHaveReturned()
+      expect(debugMock).toHaveBeenNthCalledWith(1, `Date value given ''`)
+      expect(debugMock).toHaveBeenNthCalledWith(
+        2,
+        `Date value parsed 'Tue Dec 31 2024'`
+      )
+
+      expect(setOutputMock).toHaveBeenNthCalledWith(
+        1,
+        'return_value',
+        expect.stringMatching(timeRegex)
+      )
+      expect(errorMock).not.toHaveBeenCalled()
+    }
+  )
+
   it('sets a failed status', async () => {
     await main.run()
     expect(runMock).toHaveReturned()
 
-    // Verify that all of the core library functions were called correctly
     expect(errorMock).not.toHaveBeenCalled()
   })
 })

@@ -4,8 +4,15 @@ author: 'Duncan de Boer'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'heart'
+  icon: 'crosshair'
   color: 'red'
+
+# Define your inputs here.
+inputs:
+  current_date:
+    description: 'Optional date to use'
+    required: false
+    default: ''
 
 # Define your outputs here.
 outputs:

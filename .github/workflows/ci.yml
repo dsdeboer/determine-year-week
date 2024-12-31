@@ -60,3 +60,13 @@ jobs:
       - name: Print Output
         id: output
         run: echo "${{ steps.test-action.outputs.return_value }}"
+
+      - name: Test Local Action
+        id: test-action-2
+        uses: ./
+        with:
+          current_date: '2025-01-05'
+
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-action-2.outputs.return_value }}"
